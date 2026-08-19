@@ -1,98 +1,522 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Week 8 - Authenticated Tasks API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A RESTful backend API built with NestJS, TypeScript, PostgreSQL, TypeORM, JWT authentication, bcrypt, and Jest.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This project extends the Task Manager application developed in Week 6 and Week 7 by adding user authentication, authorization, request validation, exception handling, and automated testing.
 
-## Description
+## Technologies Used
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- NestJS
+- TypeScript
+- Node.js
+- PostgreSQL
+- TypeORM
+- JWT
+- Passport
+- bcrypt
+- class-validator
+- class-transformer
+- Jest
+- Supertest
+- Thunder Client
 
-## Project setup
+## Features
 
-```bash
-$ npm install
+- User registration
+- User login
+- Password hashing with bcrypt
+- JWT authentication
+- Protected API routes
+- Request validation using DTOs
+- Global exception handling
+- PostgreSQL database integration
+- TypeORM repositories
+- Unit testing
+- End-to-end testing
+- API testing with Thunder Client
+
+## Project Structure
+
+```text
+src/
+├── auth/
+│   ├── dto/
+│   │   ├── login.dto.ts
+│   │   └── register.dto.ts
+│   ├── strategies/
+│   │   └── jwt.strategy.ts
+│   ├── auth.controller.ts
+│   ├── auth.module.ts
+│   └── auth.service.ts
+│
+├── users/
+│   ├── entities/
+│   │   └── user.entity.ts
+│   ├── users.controller.ts
+│   ├── users.module.ts
+│   └── users.service.ts
+│
+├── projects/
+│   ├── entities/
+│   ├── projects.controller.ts
+│   ├── projects.module.ts
+│   └── projects.service.ts
+│
+├── tasks/
+│   ├── entities/
+│   ├── tasks.controller.ts
+│   ├── tasks.module.ts
+│   └── tasks.service.ts
+│
+├── tags/
+│   └── entities/
+│
+├── common/
+│   └── filters/
+│       └── http-exception.filter.ts
+│
+├── app.controller.ts
+├── app.module.ts
+└── main.ts
+
+test/
+├── app.e2e-spec.ts
+├── auth.e2e-spec.ts
+└── jest-e2e.json
+````
+
+## Database
+
+This project uses PostgreSQL.
+
+Database name:
+
+```text
+week6_taskmanager
 ```
 
-## Compile and run the project
+The database contains the following tables:
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```text
+users
+projects
+tasks
+tags
+task_tags
 ```
 
-## Run tests
+The `users` table contains authentication-related fields:
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```text
+id
+name
+email
+password_hash
+created_at
+updated_at
 ```
 
-## Deployment
+Passwords are hashed using bcrypt before being stored in the database.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Environment Variables
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Create a `.env` file in the project root:
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=YOUR_POSTGRES_PASSWORD
+DB_DATABASE=week6_taskmanager
+
+JWT_SECRET=your-super-secret-jwt-key
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Replace `YOUR_POSTGRES_PASSWORD` with your PostgreSQL password.
 
-## Resources
+Do not commit the `.env` file to GitHub.
 
-Check out a few resources that may come in handy when working with NestJS:
+The `.gitignore` file should contain:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```text
+.env
+node_modules/
+dist/
+coverage/
+```
 
-## Support
+## Installation
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Clone the repository:
 
-## Stay in touch
+```bash
+git clone <repository-url>
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Navigate to the project:
 
-## License
+```bash
+cd week8-authenticated-tasks-api
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Install dependencies:
+
+```bash
+npm install
+```
+
+## Running the Application
+
+Start the development server:
+
+```bash
+npm run start:dev
+```
+
+The API will be available at:
+
+```text
+http://localhost:3000
+```
+
+The application can be tested using Thunder Client or Postman.
+
+## Authentication API
+
+### Register User
+
+Endpoint:
+
+```http
+POST /auth/register
+```
+
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "Password123!"
+}
+```
+
+Successful response:
+
+```json
+{
+  "email": "user@example.com",
+  "name": null,
+  "id": 1,
+  "createdAt": "2026-08-19T06:23:58.874Z",
+  "updatedAt": "2026-08-19T06:23:58.874Z"
+}
+```
+
+The password is never returned in the response.
+
+### Login User
+
+Endpoint:
+
+```http
+POST /auth/login
+```
+
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "Password123!"
+}
+```
+
+Successful response:
+
+```json
+{
+  "access_token": "JWT_TOKEN"
+}
+```
+
+The returned JWT token is used to access protected endpoints.
+
+## JWT Authentication
+
+Protected endpoints require a Bearer token.
+
+Add the following HTTP header:
+
+```http
+Authorization: Bearer JWT_TOKEN
+```
+
+Example:
+
+```text
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+## Request Validation
+
+The API uses NestJS `ValidationPipe` with `class-validator`.
+
+Registration and login requests validate:
+
+* Email format
+* Required fields
+* Password type
+* Minimum password length
+
+Example invalid request:
+
+```json
+{
+  "email": "invalid-email",
+  "password": "123"
+}
+```
+
+The request will be rejected with a validation error.
+
+## Error Handling
+
+The project uses a global exception filter:
+
+```text
+src/common/filters/http-exception.filter.ts
+```
+
+Errors are returned in a consistent format.
+
+Example:
+
+```json
+{
+  "statusCode": 401,
+  "message": "Invalid email or password",
+  "error": "Unauthorized",
+  "timestamp": "2026-08-19T06:23:59.051Z",
+  "path": "/auth/login"
+}
+```
+
+## Testing
+
+The project includes unit tests and end-to-end tests.
+
+Run all tests:
+
+```bash
+npm test
+```
+
+Run E2E tests:
+
+```bash
+npm run test:e2e
+```
+
+Run authentication E2E tests only:
+
+```bash
+npm run test:e2e -- --runInBand test/auth.e2e-spec.ts
+```
+
+## Authentication E2E Tests
+
+The authentication E2E tests verify:
+
+### Successful Login
+
+```text
+POST /auth/login
+```
+
+Expected status:
+
+```text
+200 OK
+```
+
+Expected response:
+
+```json
+{
+  "access_token": "..."
+}
+```
+
+### Wrong Password
+
+```text
+POST /auth/login
+```
+
+Expected status:
+
+```text
+401 Unauthorized
+```
+
+Expected response contains:
+
+```json
+{
+  "statusCode": 401,
+  "message": "Invalid email or password"
+}
+```
+
+## Thunder Client
+
+Thunder Client can be used inside VS Code to test the API.
+
+### Register
+
+```text
+POST http://localhost:3000/auth/register
+```
+
+Body:
+
+```json
+{
+  "email": "test@example.com",
+  "password": "Password123!"
+}
+```
+
+### Login
+
+```text
+POST http://localhost:3000/auth/login
+```
+
+Body:
+
+```json
+{
+  "email": "test@example.com",
+  "password": "Password123!"
+}
+```
+
+Copy the `access_token` from the response.
+
+For protected endpoints, use:
+
+```text
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## Useful Commands
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start development server:
+
+```bash
+npm run start:dev
+```
+
+Build the application:
+
+```bash
+npm run build
+```
+
+Run unit tests:
+
+```bash
+npm test
+```
+
+Run E2E tests:
+
+```bash
+npm run test:e2e
+```
+
+Run authentication E2E tests:
+
+```bash
+npm run test:e2e -- --runInBand test/auth.e2e-spec.ts
+```
+
+## Week 6 → Week 7 → Week 8
+
+### Week 6
+
+Task Manager built using:
+
+* PostgreSQL
+* Raw SQL
+* Database relationships
+* Joins
+* Aggregations
+
+### Week 7
+
+Task Manager rebuilt using:
+
+* Node.js
+* TypeScript
+* TypeORM
+* PostgreSQL
+* Entities
+* Relationships
+* Migrations
+
+### Week 8
+
+Task Manager API extended using:
+
+* NestJS
+* Authentication
+* JWT
+* bcrypt
+* DTO validation
+* Exception filters
+* Unit testing
+* E2E testing
+
+## Test Results
+
+All tests are passing.
+
+```text
+Test Suites: 2 passed, 2 total
+Tests:       3 passed, 3 total
+```
+
+Authentication tests:
+
+```text
+POST /auth/login - Success          PASS
+POST /auth/login - Wrong Password   PASS
+```
+
+## Security
+
+* Passwords are hashed using bcrypt.
+* Plain-text passwords are never stored.
+* Password hashes are not returned in API responses.
+* JWT is used for authentication.
+* Protected endpoints require a valid Bearer token.
+* Environment variables are stored in `.env`.
+* `.env` is excluded from Git.
+
+## Author
+
+**Motashim Nawaz Khan**
+
+Internship - Week 8
+
+Authenticated Tasks API
+
+```
